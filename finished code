@@ -1,0 +1,370 @@
+//Operations and file reader imports
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
+import java.util.List;
+//GUI Imports
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
+
+
+class PatientRecord {
+    int id;
+    int age;
+    String gender;
+    String hospital;
+    String medicalCondition;
+    String admissionType;
+    double billingAmount;
+
+    public PatientRecord(int id, int age, String gender, String medicalCondition, String hospital, String admissionType, double billingAmount){
+        this.id = id;
+        this.age = age;
+        this.gender = gender;
+        this.medicalCondition = medicalCondition;
+        this.hospital = hospital;
+        this.admissionType = admissionType;
+        this.billingAmount = billingAmount;
+    }
+    @Override
+    public String toString() {
+        return "ID: "+id+ "| age: "+age+ "| Gender : "+gender+ " | Condition: "+ medicalCondition + "| Hospital: " + hospital + " | Admission Type: "+ admissionType + " | Billing : $" +billingAmount;
+
+    }
+}
+class HealthcareDataStructuresSimple {
+
+    public static List<PatientRecord> loadDataset(String fileName) {
+        List<PatientRecord> records = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            int uniqueId = 1;
+            br.readLine();
+            while ((line = br.readLine()) != null) {
+                String[] fields = line.split(",");
+                if (fields.length < 7) continue;
+                try {
+                    int age = Integer.parseInt(fields[1].trim());
+                    String gender = fields[2].trim();
+                    String medicalCondition = fields[3].trim();
+                    String hospital = fields[4].trim();
+                    String admissionType = fields[5].trim();
+                    double billingAmount = Double.parseDouble(fields[6].trim());
+                    records.add(new PatientRecord(uniqueId++, age, gender, medicalCondition,
+                            hospital, admissionType, billingAmount));
+                } catch (NumberFormatException e) {
+
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
+        }
+        return records;
+    }
+    public static void insertLinkedList(List<PatientRecord> list, PatientRecord record) {
+        list.add(record);
+    }
+
+    public static PatientRecord searchLinkedList(List<PatientRecord> list, int id) {
+        for (PatientRecord r : list) {
+            if (r.id == id) return r;
+        }
+        return null;
+    }
+
+    public static boolean deleteLinkedList(List<PatientRecord> list, int id) {
+        return list.removeIf(r -> r.id == id);
+    }
+
+    public static void traverseLinkedList(List<PatientRecord> list) {
+        for (PatientRecord r : list) {
+            System.out.println(r);
+        }
+    }
+    public static void insertArrayList(List<PatientRecord> list, PatientRecord record) {
+        list.add(record);
+    }
+
+    public static PatientRecord searchArrayList(List<PatientRecord> list, int id) {
+        for (PatientRecord r : list) {
+            if (r.id == id) return r;
+        }
+        return null;
+    }
+
+    public static boolean deleteArrayList(List<PatientRecord> list, int id) {
+        return list.removeIf(r -> r.id == id);
+    }
+
+    public static void traverseArrayList(List<PatientRecord> list) {
+        for (PatientRecord r : list) {
+            System.out.println(r);
+        }
+    }
+    public static void insertHashMap(Map<Integer, PatientRecord> map, PatientRecord record) {
+        map.put(record.id, record);
+    }
+
+    public static PatientRecord searchHashMap(Map<Integer, PatientRecord> map, int id) {
+        return map.get(id);
+    }
+
+    public static boolean deleteHashMap(Map<Integer, PatientRecord> map, int id) {
+        return map.remove(id) != null;
+    }
+
+    public static void traverseHashMap(Map<Integer, PatientRecord> map) {
+        for (PatientRecord r : map.values()) {
+            System.out.println(r);
+        }
+    }
+    public static void insertQueue(Queue<PatientRecord> queue, PatientRecord record) {
+        queue.offer(record);
+    }
+
+    public static PatientRecord searchQueue(Queue<PatientRecord> queue, int id) {
+        for (PatientRecord r : queue) {
+            if (r.id == id) return r;
+        }
+        return null;
+    }
+
+    public static boolean deleteQueue(Queue<PatientRecord> queue, int id) {
+        return queue.removeIf(r -> r.id == id);
+    }
+
+    public static void traverseQueue(Queue<PatientRecord> queue) {
+        for (PatientRecord r : queue) {
+            System.out.println(r);
+        }
+    }
+    public static void benchmarkingList(String name, List <PatientRecord> list, List<PatientRecord> records){
+        long start, end;
+
+        start = System.nanoTime();
+        for(PatientRecord r : records){
+            if(name.equals("ArrayList"))insertArrayList(list, r);
+            else insertLinkedList(list, r);
+        }
+        end = System.nanoTime();
+        System.out.println(name + "Insert Time: " +(end - start)+ " ns");
+
+        System.out.println("--- Traversing " + name + " ---");
+        if (name.equals("ArrayList")) traverseArrayList(list);
+        else traverseLinkedList(list);
+
+        int searchId = records.get(new Random().nextInt(records.size())).id;
+        start = System.nanoTime();
+        PatientRecord found = (name.equals("ArrayList")) ? searchArrayList(list, searchId) : searchLinkedList(list, searchId);
+        end = System.nanoTime();
+        System.out.println(name + " Search Time: " + (end - start) + " ns");
+        System.out.println("Found record: " + (found != null ? found : "None"));
+    }
+    public static void benchmarkMap(Map<Integer, PatientRecord> map, List<PatientRecord> records) {
+        long start, end;
+
+        start = System.nanoTime();
+        for (PatientRecord r : records) {
+            insertHashMap(map, r);
+        }
+        end = System.nanoTime();
+        System.out.println("HashMap Insert Time: " + (end - start) + " ns");
+
+        System.out.println("--- Traversing HashMap ---");
+        traverseHashMap(map);
+
+        int searchId = records.get(new Random().nextInt(records.size())).id;
+        start = System.nanoTime();
+        PatientRecord found = searchHashMap(map, searchId);
+        end = System.nanoTime();
+        System.out.println("HashMap Search Time: " + (end - start) + " ns");
+        System.out.println("Found record: " + (found != null ? found : "None"));
+
+        start = System.nanoTime();
+        boolean deleted = deleteHashMap(map, searchId);
+        end = System.nanoTime();
+        System.out.println("HashMap Delete Time: " + (end - start) + " ns");
+        System.out.println("Deleted record with ID " + searchId + ": " + deleted);
+        System.out.println();
+    }
+    public static void benchmarkQueue(Queue<PatientRecord> queue, List<PatientRecord> records) {
+        long start, end;
+
+        start = System.nanoTime();
+        for (PatientRecord r : records) {
+            insertQueue(queue, r);
+        }
+        end = System.nanoTime();
+        System.out.println("Queue Insert Time: " + (end - start) + " ns");
+
+        System.out.println("--- Traversing Queue ---");
+        traverseQueue(queue);
+
+//        int searchId = records.get(new Random().nextInt(records.size())).id;
+//        start = System.nanoTime();
+//        PatientRecord found = searchQueue(queue, searchId);
+//        end = System.nanoTime();
+//        System.out.println("Queue Search Time: " + (end - start) + " ns");
+//        System.out.println("Found record: " + (found != null ? found : "None"));
+//
+//        start = System.nanoTime();
+//        boolean deleted = deleteQueue(queue, searchId);
+//        end = System.nanoTime();
+//        System.out.println("Queue Delete Time: " + (end - start) + " ns");
+//        System.out.println("Deleted record with ID " + searchId + ": " + deleted);
+//        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        List<PatientRecord> records = loadDataset("C:\\Users\\kyree\\Downloads\\CSV.txt");
+
+        if (records.isEmpty()) {
+            System.out.println("No records loaded. Please check your CSV file.");
+            return;
+        }
+
+        // ArrayList
+        List<PatientRecord> arrayList = new ArrayList<>();
+        benchmarkingList("ArrayList", arrayList, records);
+
+        // LinkedList
+        List<PatientRecord> linkedList = new LinkedList<>();
+        benchmarkingList("LinkedList", linkedList, records);
+
+        // HashMap
+        Map<Integer, PatientRecord> hashMap = new HashMap<>();
+        benchmarkMap(hashMap, records);
+
+        // Queue
+        Queue<PatientRecord> queue = new LinkedList<>();
+        benchmarkQueue(queue, records);
+    }
+
+
+}
+
+ class PatientInfoGUI extends JFrame {
+
+    private JTextField ageField, genderField, conditionField, hospitalField, admissionTypeField, billingField;
+    private JTextArea outputArea;
+
+    // Simple wait time mapping based on condition
+    private static final HashMap<String, Integer> conditionWaitTimes = new HashMap<>();
+
+    static {
+        conditionWaitTimes.put("Emergency", 5);
+        conditionWaitTimes.put("Flu", 30);
+        conditionWaitTimes.put("Injury", 20);
+        conditionWaitTimes.put("Elective", 60);
+        // Add more conditions as needed
+    }
+
+    public PatientInfoGUI() {
+        setTitle("Patient Information Input");
+        setSize(400, 500);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        // Create panel for inputs
+        JPanel panel = new JPanel(new GridLayout(8, 2, 10, 10));
+
+        panel.add(new JLabel("Age:"));
+        ageField = new JTextField();
+        panel.add(ageField);
+
+        panel.add(new JLabel("Gender (M/F):"));
+        genderField = new JTextField();
+        panel.add(genderField);
+
+        panel.add(new JLabel("Medical Condition:"));
+        conditionField = new JTextField();
+        panel.add(conditionField);
+
+        panel.add(new JLabel("Hospital:"));
+        hospitalField = new JTextField();
+        panel.add(hospitalField);
+
+        panel.add(new JLabel("Admission Type:"));
+        admissionTypeField = new JTextField();
+        panel.add(admissionTypeField);
+
+//        panel.add(new JLabel("Billing Amount:"));
+//        billingField = new JTextField();
+//        panel.add(billingField);
+
+        JButton submitButton = new JButton("Submit");
+        panel.add(submitButton);
+
+        outputArea = new JTextArea();
+        outputArea.setEditable(false);
+        outputArea.setLineWrap(true);
+        outputArea.setWrapStyleWord(true);
+
+        // Add components to frame
+        add(panel, BorderLayout.NORTH);
+        add(new JScrollPane(outputArea), BorderLayout.CENTER);
+
+        // Button action
+        submitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayPatientInfo();
+            }
+        });
+    }
+     private double calculateBilling(String condition) {
+         String c = condition.toLowerCase();
+         if (c.contains("emergency")) return 1000.0;
+         if (c.contains("flu")) return 200.0;
+         if (c.contains("injury")) return 500.0;
+         if (c.contains("elective")) return 300.0;
+         return 400.0; // default billing
+     }
+
+     private int calculateWaitTime(String condition) {
+         String c = condition.toLowerCase();
+         if (c.contains("emergency") || c.contains("flu")) return 5;
+         if (c.contains("injury")) return 20;
+         return 45; // Default wait time
+     }
+
+    private void displayPatientInfo() {
+        try {
+            int age = Integer.parseInt(ageField.getText().trim());
+            String gender = genderField.getText().trim();
+            String condition = conditionField.getText().trim();
+            String hospital = hospitalField.getText().trim();
+            String type = admissionTypeField.getText().trim();
+
+            // Calculate billing automatically
+            double billing = calculateBilling(condition);
+
+            PatientRecord newPatient = new PatientRecord(new Random().nextInt(1000), age, gender, condition, hospital, type, billing);
+            int waitTime = calculateWaitTime(condition);
+            long startTime=System.nanoTime();
+            long endTime = System.nanoTime();
+            long duration = endTime - startTime;
+
+
+            outputArea.setText("--- PATIENT REGISTERED ---\n" + newPatient.toString() +
+                    "\nESTIMATED WAIT TIME: " + waitTime + " Minutes\n" +
+                    "BILLING AMOUNT: $" + String.format("%.2f", billing)+ "\n\n" +
+                    "Processing Time: " + duration + " ns");
+
+
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Please enter valid numeric values for Age and Billing.", "Input Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            PatientInfoGUI gui = new PatientInfoGUI();
+            gui.setVisible(true);
+        });
+    }
+}
