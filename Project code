@@ -27,3 +27,193 @@ class PatientRecord {
 
      }
  }
+class HealthcareDataStructuresSimple {
+
+    public static List<PatientRecord> loadDataset(String fileName) {
+        List<PatientRecord> records = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\kyree\\IdeaProjects\\TestCosc\\New folder\\Programing\\CSV.txt"))) {
+            String line;
+            int uniqueId = 1;
+            br.readLine();
+            while ((line = br.readLine()) != null) {
+                String[] fields = line.split(",");
+                if (fields.length < 7) continue;
+                try {
+                    int age = Integer.parseInt(fields[1].trim());
+                    String gender = fields[2].trim();
+                    String medicalCondition = fields[3].trim();
+                    String hospital = fields[4].trim();
+                    String admissionType = fields[5].trim();
+                    double billingAmount = Double.parseDouble(fields[6].trim());
+                    records.add(new PatientRecord(uniqueId++, age, gender, medicalCondition,
+                            hospital, admissionType, billingAmount));
+                } catch (NumberFormatException e) {
+
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
+        }
+        return records;
+    }
+//Linkedlist Operations
+public static void insertLinkedList(List<PatientRecord> list, PatientRecord record) {
+        list.add(record);
+    }
+
+    public static PatientRecord searchLinkedList(List<PatientRecord> list, int id) {
+        for (PatientRecord r : list) {
+            if (r.id == id) return r;
+        }
+        return null;
+    }
+
+    public static boolean deleteLinkedList(List<PatientRecord> list, int id) {
+        return list.removeIf(r -> r.id == id);
+    }
+
+    public static void traverseLinkedList(List<PatientRecord> list) {
+        for (PatientRecord r : list) {
+            System.out.println(r);
+        }
+    }
+//ArrayList Operations:
+
+
+
+
+
+
+
+
+
+
+
+
+//HashMap Operations:
+
+
+
+
+
+
+
+//Queue Operations:
+
+
+
+
+
+
+
+
+
+// BenchMarking
+
+ public static void benchmarkingList(String name, List <PatientRecord> list, List<PatientRecord> records){
+        long start, end;
+
+        start = System.nanoTime();
+        for(PatientRecord r : records){
+            if(name.equals("ArrayList"))insertArrayList(list, r);
+            else insertLinkedList(list, r);
+        }
+        end = System.nanoTime();
+        System.out.println(name + "Insert Time: " +(end - start)+ " ns");
+
+        System.out.println("--- Traversing " + name + " ---");
+        if (name.equals("ArrayList")) traverseArrayList(list);
+        else traverseLinkedList(list);
+
+        int searchId = records.get(new Random().nextInt(records.size())).id;
+        start = System.nanoTime();
+        PatientRecord found = (name.equals("ArrayList")) ? searchArrayList(list, searchId) : searchLinkedList(list, searchId);
+        end = System.nanoTime();
+        System.out.println(name + " Search Time: " + (end - start) + " ns");
+        System.out.println("Found record: " + (found != null ? found : "None"));
+    }
+    public static void benchmarkMap(Map<Integer, PatientRecord> map, List<PatientRecord> records) {
+        long start, end;
+
+        start = System.nanoTime();
+        for (PatientRecord r : records) {
+            insertHashMap(map, r);
+        }
+        end = System.nanoTime();
+        System.out.println("HashMap Insert Time: " + (end - start) + " ns");
+
+        System.out.println("--- Traversing HashMap ---");
+        traverseHashMap(map);
+
+        int searchId = records.get(new Random().nextInt(records.size())).id;
+        start = System.nanoTime();
+        PatientRecord found = searchHashMap(map, searchId);
+        end = System.nanoTime();
+        System.out.println("HashMap Search Time: " + (end - start) + " ns");
+        System.out.println("Found record: " + (found != null ? found : "None"));
+
+start = System.nanoTime();
+        boolean deleted = deleteHashMap(map, searchId);
+        end = System.nanoTime();
+        System.out.println("HashMap Delete Time: " + (end - start) + " ns");
+        System.out.println("Deleted record with ID " + searchId + ": " + deleted);
+        System.out.println();
+
+
+}
+ public static void benchmarkQueue(Queue<PatientRecord> queue, List<PatientRecord> records) {
+        long start, end;
+
+        start = System.nanoTime();
+        for (PatientRecord r : records) {
+            insertQueue(queue, r);
+        }
+        end = System.nanoTime();
+        System.out.println("Queue Insert Time: " + (end - start) + " ns");
+
+        System.out.println("--- Traversing Queue ---");
+        traverseQueue(queue);
+
+        int searchId = records.get(new Random().nextInt(records.size())).id;
+        start = System.nanoTime();
+        PatientRecord found = searchQueue(queue, searchId);
+        end = System.nanoTime();
+        System.out.println("Queue Search Time: " + (end - start) + " ns");
+        System.out.println("Found record: " + (found != null ? found : "None"));
+
+        start = System.nanoTime();
+        boolean deleted = deleteQueue(queue, searchId);
+        end = System.nanoTime();
+        System.out.println("Queue Delete Time: " + (end - start) + " ns");
+        System.out.println("Deleted record with ID " + searchId + ": " + deleted);
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        List<PatientRecord> records = loadDataset("C:\\Users\\kyree\\Downloads\\CSV.txt");
+
+        if (records.isEmpty()) {
+            System.out.println("No records loaded. Please check your CSV file.");
+            return;
+        }
+
+        // ArrayList
+        List<PatientRecord> arrayList = new ArrayList<>();
+        benchmarkingList("ArrayList", arrayList, records);
+
+        // LinkedList
+        List<PatientRecord> linkedList = new LinkedList<>();
+        benchmarkingList("LinkedList", linkedList, records);
+
+        // HashMap
+        Map<Integer, PatientRecord> hashMap = new HashMap<>();
+        benchmarkMap(hashMap, records);
+
+        // Queue
+        Queue<PatientRecord> queue = new LinkedList<>();
+        benchmarkQueue(queue, records);
+    }
+
+
+}
+   
