@@ -1,3 +1,0 @@
-id,age,gender,medicalCondition,hospital,admissionType,billingAmount
-111345,45,M,Flu,General,Emergency,500.0
-234577,30,F,Injury,City,Elective,1200.5
