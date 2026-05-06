@@ -8,139 +8,139 @@ public class UI {
 
     private HospitalManager manager = new HospitalManager();
 
-    public void start() {
-        while (true) {
-            int choice = showMenu();
+        public void start () {
+            while (true) {
+                String menu =
+                        " Hospital Managment System \n" +
+                                "1. Add Patient\n" +
+                                "2. Delete Patient\n" +
+                                "3. Lookup Patient\n" +
+                                "4. View All Patients\n" +
+                                "5. View Emergency Patients\n" +
+                                "6. Undo Delete\n" +
+                                "7. Save Records\n" +
+                                "8. Exit\n\n" +
+                                "Enter choice:";
 
-            if (choice == 8) break;
+                String choice = JOptionPane.showInputDialog(menu);
+                if (choice == null) return;
 
-            switch (choice) {
-                case 0: addPatient(); break;
-                case 1: deletePatient(); break;
-                case 2: viewAll(); break;
-                case 3: searchCondition(); break;
-                case 4: viewEmergency(); break;
-                case 5: lookupPatient(); break;
-                case 6: undoDelete(); break;
-                case 7: saveRecords(); break;
+                switch (choice) {
+
+                    case "1":  // ADD PATIENT
+                        String idInput = JOptionPane.showInputDialog("Enter patient ID:");
+                        if (idInput == null) break;
+
+                        int id;
+                        try {
+                            id = Integer.parseInt(idInput.trim());
+                        } catch (NumberFormatException e) {
+                            JOptionPane.showMessageDialog(null, "ID must be a number.");
+                            break;
+                        }
+
+                        String name = JOptionPane.showInputDialog("Enter name:");
+                        if (name == null) break;
+
+                        String ageInput = JOptionPane.showInputDialog("Enter age:");
+                        if (ageInput == null) break;
+
+                        int age;
+                        try {
+                            age = Integer.parseInt(ageInput.trim());
+                        } catch (NumberFormatException e) {
+                            JOptionPane.showMessageDialog(null, "Age must be a number.");
+                            break;
+                        }
+
+                        String gender = JOptionPane.showInputDialog("Enter gender:");
+                        if (gender == null) break;
+
+                        String condition = JOptionPane.showInputDialog("Enter condition:");
+                        if (condition == null) break;
+
+                        String hospital = JOptionPane.showInputDialog("Enter hospital:");
+                        if (hospital == null) break;
+
+                        String admission = JOptionPane.showInputDialog("Enter admission type:");
+                        if (admission == null) break;
+
+                        String billingInput = JOptionPane.showInputDialog("Enter billing amount:");
+                        if (billingInput == null) break;
+
+                        double billing;
+                        try {
+                            billing = Double.parseDouble(billingInput.trim());
+                        } catch (NumberFormatException e) {
+                            JOptionPane.showMessageDialog(null, "Billing must be a number.");
+                            break;
+                        }
+
+                        String severity = JOptionPane.showInputDialog("Enter severity (GREEN/YELLOW/ORANGE/RED):");
+                        if (severity == null) break;
+
+                        Patient p = new Patient(id, name, age, gender, condition, hospital, admission, billing, severity);
+                        manager.addPatient(p);
+
+                        JOptionPane.showMessageDialog(null, "Patient added.");
+                        break;
+
+                    case "2":  // DELETE
+                        String delInput = JOptionPane.showInputDialog("Enter ID to delete:");
+                        if (delInput == null) break;
+
+                        try {
+                            int delId = Integer.parseInt(delInput.trim());
+                            manager.deletePatient(delId);
+                            JOptionPane.showMessageDialog(null, "Patient deleted.");
+                        } catch (NumberFormatException e) {
+                            JOptionPane.showMessageDialog(null, "ID must be a number.");
+                        }
+                        break;
+
+                    case "3":  // LOOKUP
+                        String lookupInput = JOptionPane.showInputDialog("Enter ID to lookup:");
+                        if (lookupInput == null) break;
+
+                        try {
+                            int lookupId = Integer.parseInt(lookupInput.trim());
+                            JOptionPane.showMessageDialog(null, manager.lookupPatient(lookupId));
+                        } catch (NumberFormatException e) {
+                            JOptionPane.showMessageDialog(null, "ID must be a number.");
+                        }
+                        break;
+
+                    case "4":
+                        JOptionPane.showMessageDialog(null, manager.viewAllPatients());
+                        break;
+
+                    case "5":
+                        JOptionPane.showMessageDialog(null, manager.viewEmergencyPatients());
+                        break;
+
+                    case "6":
+                        manager.undoDelete();
+                        JOptionPane.showMessageDialog(null, "Undo complete.");
+                        break;
+
+                    case "7":
+                        manager.saveRecords();
+                        JOptionPane.showMessageDialog(null, "Records saved.");
+                        break;
+
+                    case "8":
+                        JOptionPane.showMessageDialog(null, "Goodbye.");
+                        return;
+
+                    default:
+                        JOptionPane.showMessageDialog(null, "Invalid choice.");
+                        break;
+                }
             }
         }
-    }
 
-    // ---------------------------------------------------------
-    // CLEAN TWO‑ROW MENU WITH REAL BUTTONS (NO DUPLICATES)
-    // ---------------------------------------------------------
-    private int showMenu() {
-
-        JDialog dialog = new JDialog();
-        dialog.setTitle("Hospital Management System");
-        dialog.setModal(true);
-        dialog.setSize(600, 250);
-        dialog.setLocationRelativeTo(null);
-
-        JPanel panel = new JPanel(new GridLayout(2, 4, 10, 10));
-
-        String[] labels = {
-                "Add Patient",
-                "Delete Patient",
-                "View All Patients",
-                "Search by Condition",
-                "View Emergency",
-                "Lookup by ID",
-                "Undo Delete",
-                "Save Records"
-        };
-
-        int[] result = {-1};
-
-        for (int i = 0; i < labels.length; i++) {
-            int index = i;
-            JButton button = new JButton(labels[i]);
-            button.addActionListener(e -> {
-                result[0] = index;
-                dialog.dispose();
-            });
-            panel.add(button);
-        }
-
-        dialog.add(panel);
-        dialog.setVisible(true);
-
-        return result[0];
-    }
-
-    // ---------------------------------------------------------
-    // MENU ACTIONS
-    // ---------------------------------------------------------
-
-    private void addPatient() {
-        String name = JOptionPane.showInputDialog("Enter name:");
-        int age = Integer.parseInt(JOptionPane.showInputDialog("Enter age:"));
-        String gender = JOptionPane.showInputDialog("Enter gender:");
-        String condition = JOptionPane.showInputDialog("Enter condition:");
-        String hospital = JOptionPane.showInputDialog("Enter hospital:");
-
-        String[] severityOptions = {"RED", "ORANGE", "YELLOW", "GREEN"};
-        String severity = (String) JOptionPane.showInputDialog(
-                null,
-                "Select Severity:",
-                "Severity",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                severityOptions,
-                severityOptions[0]
-        );
-
-        if (severity == null) {
-            JOptionPane.showMessageDialog(null, "No severity selected.");
-            return;
-        }
-
-        String admission = (severity.equals("RED") || severity.equals("ORANGE"))
-                ? "Emergency"
-                : "Standard";
-
-        Patient p = new Patient(
-                new Random().nextInt(1000),
-                name, age, gender, condition,
-                hospital, admission, 500, severity
-        );
-
-        manager.addPatient(p);
-        JOptionPane.showMessageDialog(null, "Patient added successfully.");
-    }
-
-    private void deletePatient() {
-        int id = Integer.parseInt(JOptionPane.showInputDialog("Enter patient ID to delete:"));
-        manager.deletePatient(id);
-        JOptionPane.showMessageDialog(null, "Delete attempted.");
-    }
-
-    private void viewAll() {
-        JOptionPane.showMessageDialog(null, manager.viewAllPatients());
-    }
-
-    private void searchCondition() {
-        String cond = JOptionPane.showInputDialog("Enter condition:");
-        JOptionPane.showMessageDialog(null, manager.searchCondition(cond));
-    }
-
-    private void viewEmergency() {
-        JOptionPane.showMessageDialog(null, manager.viewEmergencyPatients());
-    }
-
-    private void lookupPatient() {
-        int id = Integer.parseInt(JOptionPane.showInputDialog("Enter patient ID:"));
-        JOptionPane.showMessageDialog(null, manager.lookupPatient(id));
-    }
-
-    private void undoDelete() {
-        manager.undoDelete();
-        JOptionPane.showMessageDialog(null, "Undo complete.");
-    }
-
-    private void saveRecords() {
-        manager.saveRecords();
-        JOptionPane.showMessageDialog(null, "Records saved.");
+    public HospitalManager getManager() {
+            return manager;
     }
 }
+
