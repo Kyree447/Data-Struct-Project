@@ -50,7 +50,7 @@ public String getName() {
             case "ORANGE": return 1;
             case "YELLOW": return 2;
             case "GREEN": return 3;
-            default: return 4; // unknown severity
+            default: return 4;
         }
     }
     @Override
@@ -68,6 +68,7 @@ public String getName() {
     public static Patient fromString(String line) {
         String[] parts = line.split("\\|");
 
+// takes saved data and splits into pieces and convers it all into the right format and puts it into to patient to be reused in hopsital manager
         int id = Integer.parseInt(parts[0].split(":")[1].trim());
         String name = parts[1].split(":")[1].trim();
         int age = Integer.parseInt(parts[2].split(":")[1].trim());
@@ -77,7 +78,7 @@ public String getName() {
         String hospital = parts[6].split(":")[1].trim();
         String admission = parts[7].split(":")[1].trim();
 
-        // Remove $ and spaces before parsing
+        // removes $ and spaces before parsing
         String billingRaw = parts[8].split(":")[1].trim().replace("$", "");
         double billing = Double.parseDouble(billingRaw);
 
