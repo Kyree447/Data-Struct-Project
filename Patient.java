@@ -65,6 +65,28 @@ public String getName() {
                 " | Admission: " + admissionType +
                 " | Billing: $" + billingAmount;
     }
+    public static Patient fromString(String line) {
+        String[] parts = line.split("\\|");
+
+        int id = Integer.parseInt(parts[0].split(":")[1].trim());
+        String name = parts[1].split(":")[1].trim();
+        int age = Integer.parseInt(parts[2].split(":")[1].trim());
+        String gender = parts[3].split(":")[1].trim();
+        String condition = parts[4].split(":")[1].trim();
+        String severity = parts[5].split(":")[1].trim();
+        String hospital = parts[6].split(":")[1].trim();
+        String admission = parts[7].split(":")[1].trim();
+
+        // Remove $ and spaces before parsing
+        String billingRaw = parts[8].split(":")[1].trim().replace("$", "");
+        double billing = Double.parseDouble(billingRaw);
+
+        return new Patient(id, name, age, gender, condition,
+                hospital, admission, billing, severity);
+    }
+
+
+
 
 
 }
