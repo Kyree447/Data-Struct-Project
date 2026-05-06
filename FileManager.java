@@ -9,7 +9,7 @@ import java.util.LinkedList;
 
 public class FileManager {
 
-    // SAVE PATIENTS TO patients.txt
+    // method to save patients to file if patients is empty statment else saves to file
     public static void savePatients(LinkedList<Patient> patients) {
         try (PrintWriter writer = new PrintWriter(new FileWriter("patients.txt"))) {
 
@@ -27,7 +27,7 @@ public class FileManager {
         }
     }
 
-    // LOAD PATIENTS FROM patients.txt
+    // method to load patients
     public static LinkedList<Patient> loadPatients() {
         LinkedList<Patient> list = new LinkedList<>();
 
