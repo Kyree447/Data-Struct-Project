@@ -7,15 +7,13 @@ public class HospitalManager {
     private LinkedList<Patient> patients = new LinkedList<>();
     private Stack<Patient> deletedPatients = new Stack<>();
     private HashMap<Integer, Patient> patientDirectory = new HashMap<>();
-    private PriorityQueue<Patient> emergencyQueue =
-            new PriorityQueue<>((p1, p2) ->
+    private PriorityQueue<Patient> emergencyQueue = new PriorityQueue<>((p1, p2) ->
                     p1.getSeverityLevel() - p2.getSeverityLevel());
 
-    // CONSTRUCTOR
     public HospitalManager() {
         patients = FileManager.loadPatients();
 
-        // Rebuild HashMap + PriorityQueue
+        // rebuilds hash map and priority queue on startup
         for (Patient p : patients) {
             patientDirectory.put(p.getId(), p);
 
@@ -25,21 +23,18 @@ public class HospitalManager {
         }
     }
 
-    // ADD PATIENT
+    // method to add patient loads them to file if severity is oranger or red adds them to priority queue generates
     public void addPatient(Patient patient) {
         patients.add(patient);
-
         if (patient.getSeverityLevel() <= 1) {
             emergencyQueue.add(patient);
         }
-
         patientDirectory.put(patient.getId(), patient);
     }
 
-    // DELETE PATIENT
+    // method to delete patient iterates through linked list til id = id and pushes patient to stack for undo and deltes from all data structures and returns
     public void deletePatient(int id) {
         Iterator<Patient> iterator = patients.iterator();
-
         while (iterator.hasNext()) {
             Patient p = iterator.next();
             if (p.getId() == id) {
@@ -54,7 +49,7 @@ public class HospitalManager {
         }
     }
 
-    // UNDO DELETE
+    // method to undo delete if stack is not empty pushes top of stack and restores to data structres
     public void undoDelete() {
         if (!deletedPatients.isEmpty()) {
             Patient restored = deletedPatients.pop();
@@ -68,49 +63,46 @@ public class HospitalManager {
         }
     }
 
-    // LOOKUP BY ID
+    // method to look up by id if hashmap is not empty return id entered by user else no id found
     public String lookupPatient(int id) {
         Patient p = patientDirectory.get(id);
-        return (p != null) ? p.toString() : "No patient found with that ID.";
+        if (p != null) {
+            return p.toString();
+        } else {
+            return "No patient found with that ID.";
+        }
     }
 
-    // VIEW ALL PATIENTS
+    // method to view patients if patients is not empty print statment else view patients
     public String viewAllPatients() {
-        if (patients.isEmpty()) return "No patients available.";
-
-        StringBuilder sb = new StringBuilder();
-        for (Patient p : patients) sb.append(p).append("\n");
-        return sb.toString();
-    }
-
-    // SEARCH BY CONDITION
-    public String searchCondition(String condition) {
-        StringBuilder sb = new StringBuilder();
-
-        for (Patient p : patients) {
-            if (p.getCondition().equalsIgnoreCase(condition)) {
-                sb.append(p).append("\n");
-            }
+        if (patients.isEmpty()) {
+            System.out.print( "No patients available.");
+        } else {
+            StringBuilder sb = new StringBuilder();
+            for (Patient p : patients) sb.append(p).append("\n");
+            System.out.print(sb.toString());
         }
-
-        return sb.length() == 0 ? "No patients found." : sb.toString();
+        return "";
     }
 
-    // VIEW EMERGENCY PATIENTS
+    // method to view patients if emergency queue is empty statment else print patient info
     public String viewEmergencyPatients() {
-        if (emergencyQueue.isEmpty()) return "No emergency patients.";
+        if (emergencyQueue.isEmpty()) {
+            return "No emergency patients.";
+        } else {
+            StringBuilder sb = new StringBuilder();
+            PriorityQueue<Patient> copy = new PriorityQueue<>(emergencyQueue);
 
-        StringBuilder sb = new StringBuilder();
-        PriorityQueue<Patient> copy = new PriorityQueue<>(emergencyQueue);
+            while (!copy.isEmpty()) {
+                sb.append(copy.poll()).append("\n");
+            }
 
-        while (!copy.isEmpty()) {
-            sb.append(copy.poll()).append("\n");
+            return sb.toString();
         }
-
-        return sb.toString();
     }
 
-    // SAVE RECORDS
+
+    // method to save records calls filemanager methods and saves info from patients
     public void saveRecords() {
         FileManager.savePatients(patients);
     }
